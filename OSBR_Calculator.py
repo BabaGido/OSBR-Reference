@@ -12,22 +12,27 @@ if uploaded_file is not None:
         # Read the CSV file
         df = pd.read_csv(uploaded_file)
 
+        # Normalize column names: lowercase and remove spaces/special characters
+        df.columns = df.columns.str.lower().str.replace(r"[\s_/]", "", regex=True)
+
         # Display the uploaded data
         st.write("Uploaded Data Preview:")
         st.dataframe(df.head())
 
-        # Print column names for debugging
-        st.write("Columns in the uploaded file:")
+        # Print normalized column names for debugging
+        st.write("Normalized Columns in the uploaded file:")
         st.write(df.columns.tolist())
 
-        # Check if the required columns exist
+        # Define required columns (normalized)
         required_columns = [
-            "Years", "Scenario", "Draft", "Demand Type", "Product Code", "Plant", "Mfg Code",
-            "Lots", "Volumetric Grams Manufactured", "Active Gram Manufactured", "Units Manufactured",
-            "Raw Material Cost", "Site inventoriable expenses", "Non Site inventoriable expenses",
-            "Normal Scrap", "Contractor Spend", "COGM Judgement", "Carry Over Cost", "Wip Cost COGM",
-            "COGM Cost", "_Product", "_Mfg Stage", "_Site", "_DP/SP type", "_Pres Type", "_Presentation"
+            "years", "scenario", "draft", "demandtype", "productcode", "plant", "mfgcode",
+            "lots", "volumetricgramsmanufactured", "activegrammanufactured", "unitsmanufactured",
+            "rawmaterialcost", "siteinventoriableexpenses", "nonsiteinventoriableexpenses",
+            "normalscrap", "contractorspend", "cogmjudgement", "carryovercost", "wipcostcogm",
+            "cogmcost", "product", "mfgstage", "site", "dpsptype", "prestype", "presentation"
         ]
+
+        # Check if the required columns exist
         missing_columns = [col for col in required_columns if col not in df.columns]
 
         if not missing_columns:
@@ -37,7 +42,7 @@ if uploaded_file is not None:
             st.stop()
 
         # Dropdown for Year Range
-        year_list = sorted(df["Years"].unique())
+        year_list = sorted(df["years"].unique())
         start_year, end_year = st.select_slider(
             "Select Year Range",
             options=year_list,
@@ -46,33 +51,33 @@ if uploaded_file is not None:
         st.write(f"Selected Year Range: {start_year} to {end_year}")
 
         # Dropdown for Scenario
-        scenario_list = df["Scenario"].unique()
+        scenario_list = df["scenario"].unique()
         selected_scenario = st.selectbox("Select Scenario", scenario_list)
         st.write(f"Selected Scenario: {selected_scenario}")
 
         # Dropdown for Product Code
-        product_list = df["Product Code"].unique()
+        product_list = df["productcode"].unique()
         selected_product = st.selectbox("Select Product Code", product_list)
         st.write(f"Selected Product Code: {selected_product}")
 
         # Dropdown for Plant
-        plant_list = df["Plant"].unique()
+        plant_list = df["plant"].unique()
         selected_plant = st.selectbox("Select Plant", plant_list)
         st.write(f"Selected Plant: {selected_plant}")
 
         # Dropdown for Mfg Code
-        mfg_code_list = df["Mfg Code"].unique()
+        mfg_code_list = df["mfgcode"].unique()
         selected_mfg_code = st.selectbox("Select Mfg Code", mfg_code_list)
         st.write(f"Selected Mfg Code: {selected_mfg_code}")
 
         # Filter data based on selections
         filtered_data = df[
-            (df["Years"] >= start_year) &
-            (df["Years"] <= end_year) &
-            (df["Scenario"] == selected_scenario) &
-            (df["Product Code"] == selected_product) &
-            (df["Plant"] == selected_plant) &
-            (df["Mfg Code"] == selected_mfg_code)
+            (df["years"] >= start_year) &
+            (df["years"] <= end_year) &
+            (df["scenario"] == selected_scenario) &
+            (df["productcode"] == selected_product) &
+            (df["plant"] == selected_plant) &
+            (df["mfgcode"] == selected_mfg_code)
         ]
 
         if not filtered_data.empty:
@@ -81,19 +86,19 @@ if uploaded_file is not None:
 
             # Perform calculations
             # 1. Average Cost/Lot ($M)
-            total_cogm_cost = filtered_data["COGM Cost"].sum()
-            total_lots = filtered_data["Lots"].sum()
+            total_cogm_cost = filtered_data["cogmcost"].sum()
+            total_lots = filtered_data["lots"].sum()
             average_cost_per_lot = (total_cogm_cost / total_lots) / 1_000_000 if total_lots != 0 else 0  # Convert to $M
 
             # 2. Average Raw Materials (RM) Cost/Lot ($M)
-            total_raw_material_cost = filtered_data["Raw Material Cost"].sum()
+            total_raw_material_cost = filtered_data["rawmaterialcost"].sum()
             average_rm_cost_per_lot = (total_raw_material_cost / total_lots) / 1_000_000 if total_lots != 0 else 0  # Convert to $M
 
             # 3. Cost per Sold Unit for a given year
             selected_year = st.selectbox("Select Year for Cost per Sold Unit", year_list)
-            yearly_data = filtered_data[filtered_data["Years"] == selected_year]
-            total_cogm_cost_year = yearly_data["COGM Cost"].sum()
-            total_units_manufactured_year = yearly_data["Units Manufactured"].sum()
+            yearly_data = filtered_data[filtered_data["years"] == selected_year]
+            total_cogm_cost_year = yearly_data["cogmcost"].sum()
+            total_units_manufactured_year = yearly_data["unitsmanufactured"].sum()
             cost_per_sold_unit = total_cogm_cost_year / total_units_manufactured_year if total_units_manufactured_year != 0 else 0
 
             # Display results
