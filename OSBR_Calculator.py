@@ -15,6 +15,18 @@ if uploaded_file is not None:
         # Normalize column names: lowercase and remove spaces/special characters
         df.columns = df.columns.str.lower().str.replace(r"[\s_/]", "", regex=True)
 
+        # Convert numeric columns (remove commas and convert to float)
+        numeric_columns = [
+            "cogmcost", "rawmaterialcost", "lots", "volumetricgramsmanufactured",
+            "activegrammanufactured", "unitsmanufactured", "siteinventoriableexpenses",
+            "nonsiteinventoriableexpenses", "normalscrap", "contractorspend",
+            "cogmjudgement", "carryovercost", "wipcostcogm"
+        ]
+        for col in numeric_columns:
+            if col in df.columns:
+                df[col] = df[col].replace({',': ''}, regex=True)  # Remove commas
+                df[col] = pd.to_numeric(df[col], errors="coerce")  # Convert to numeric
+
         # Display the uploaded data
         st.write("Uploaded Data Preview:")
         st.dataframe(df.head())
@@ -26,7 +38,7 @@ if uploaded_file is not None:
         # Define required columns (normalized)
         required_columns = [
             "years", "scenario", "draft", "demandtype", "productcode", "plant", "mfgcode",
-            "lots", "volumetricgramsmanufactured", "activegramsmanufactured", "unitsmanufactured",
+            "lots", "volumetricgramsmanufactured", "activegrammanufactured", "unitsmanufactured",
             "rawmaterialcost", "siteinventoriableexpenses", "nonsiteinventoriableexpenses",
             "normalscrap", "contractorspend", "cogmjudgement", "carryovercost", "wipcostcogm",
             "cogmcost", "product", "mfgstage", "site", "dpsptype", "prestype", "presentation"
@@ -43,10 +55,13 @@ if uploaded_file is not None:
 
         # Dropdown for Year Range
         year_list = sorted(df["years"].unique())
+        min_year = min(year_list)
+        max_year = max(year_list)
+        start_year_default = max(2021, min_year)  # Start from 2021 or the earliest year in the data
         start_year, end_year = st.select_slider(
             "Select Year Range",
             options=year_list,
-            value=(min(year_list), max(year_list))
+            value=(start_year_default, max_year)
         )
         st.write(f"Selected Year Range: {start_year} to {end_year}")
 
