@@ -19,28 +19,6 @@ if uploaded_file is not None:
         st.write("Uploaded Data Preview:")
         st.dataframe(df.head())
 
-        # Print normalized column names for debugging
-        st.write("Normalized Columns in the uploaded file:")
-        st.write(df.columns.tolist())
-
-        # Define required columns (normalized)
-        required_columns = [
-            "years", "scenario", "draft", "demandtype", "productcode", "plant", "mfgcode",
-            "lots", "volumetricgramsmanufactured", "activegramsmanufactured", "unitsmanufactured",
-            "rawmaterialcost", "siteinventoriableexpenses", "nonsiteinventoriableexpenses",
-            "normalscrap", "contractorspend", "cogmjudgement", "carryovercost", "wipcostcogm",
-            "cogmcost", "product", "mfgstage", "site", "dpsptype", "prestype", "presentation"
-        ]
-
-        # Check if the required columns exist
-        missing_columns = [col for col in required_columns if col not in df.columns]
-
-        if not missing_columns:
-            st.write("✅ All required columns are present.")
-        else:
-            st.error(f"❌ The following required columns are missing: {', '.join(missing_columns)}")
-            st.stop()
-
         # Clean numeric columns
         numeric_columns = [
             "cogmcost", "rawmaterialcost", "lots", "volumetricgramsmanufactured",
@@ -57,67 +35,79 @@ if uploaded_file is not None:
                 # Fill NaN values with 0 (or handle them as needed)
                 df[col] = df[col].fillna(0)
 
-        # Display cleaned data for debugging
-        st.write("Cleaned Data Preview:")
-        st.dataframe(df.head())
+        # Define required columns (normalized)
+        required_columns = [
+            "years", "scenario", "draft", "demandtype", "productcode", "plant", "mfgcode",
+            "lots", "volumetricgramsmanufactured", "activegrammanufactured", "unitsmanufactured",
+            "rawmaterialcost", "siteinventoriableexpenses", "nonsiteinventoriableexpenses",
+            "normalscrap", "contractorspend", "cogmjudgement", "carryovercost", "wipcostcogm",
+            "cogmcost", "product", "mfgstage", "site", "dpsptype", "prestype", "presentation"
+        ]
 
-        # Dropdown for Year Range
+        # Check if the required columns exist
+        missing_columns = [col for col in required_columns if col not in df.columns]
+
+        if not missing_columns:
+            st.write("✅ All required columns are present.")
+        else:
+            st.error(f"❌ The following required columns are missing: {', '.join(missing_columns)}")
+            st.stop()
+
+        # Year Selection (Multi-Select Dropdown)
         year_list = sorted(df["years"].unique())
-        min_year = min(year_list)
-        max_year = max(year_list)
-        start_year_default = max(2021, min_year)  # Start from 2021 or the earliest year in the data
-        start_year, end_year = st.select_slider(
-            "Select Year Range",
+        selected_years = st.multiselect(
+            "Select Years",
             options=year_list,
-            value=(start_year_default, max_year)
+            default=year_list  # Default to all years
         )
-        st.write(f"Selected Year Range: {start_year} to {end_year}")
 
         # Dropdown for Scenario
         scenario_list = df["scenario"].unique()
-        selected_scenario = st.selectbox("Select Scenario", scenario_list)
+        selected_scenario = st.selectbox("Select Scenario", [""] + list(scenario_list))
 
         # Dropdown for Product Code
         product_list = df["productcode"].unique()
-        selected_product = st.selectbox("Select Product Code", product_list)
+        selected_product = st.selectbox("Select Product Code", [""] + list(product_list))
 
         # Dropdown for Plant
         plant_list = df["plant"].unique()
-        selected_plant = st.selectbox("Select Plant", plant_list)
+        selected_plant = st.selectbox("Select Plant", [""] + list(plant_list))
 
         # Dropdown for Mfg Code
         mfg_code_list = df["mfgcode"].unique()
-        selected_mfg_code = st.selectbox("Select Mfg Code", mfg_code_list)
+        selected_mfg_code = st.selectbox("Select Mfg Code", [""] + list(mfg_code_list))
 
         # Dropdown for Product
         product_name_list = df["product"].unique()
-        selected_product_name = st.selectbox("Select Product", product_name_list)
+        selected_product_name = st.selectbox("Select Product", [""] + list(product_name_list))
 
         # Dropdown for DP/SP Type
         dpsp_type_list = df["dpsptype"].unique()
-        selected_dpsp_type = st.selectbox("Select DP/SP Type", dpsp_type_list)
+        selected_dpsp_type = st.selectbox("Select DP/SP Type", [""] + list(dpsp_type_list))
 
         # Dropdown for Pres Type
         pres_type_list = df["prestype"].unique()
-        selected_pres_type = st.selectbox("Select Pres Type", pres_type_list)
+        selected_pres_type = st.selectbox("Select Pres Type", [""] + list(pres_type_list))
 
         # Dropdown for Presentation
         presentation_list = df["presentation"].unique()
-        selected_presentation = st.selectbox("Select Presentation", presentation_list)
+        selected_presentation = st.selectbox("Select Presentation", [""] + list(presentation_list))
 
         # Filter data based on selections
-        filtered_data = df[
-            (df["years"] >= start_year) &
-            (df["years"] <= end_year) &
-            (df["scenario"] == selected_scenario) &
-            (df["productcode"] == selected_product) &
-            (df["plant"] == selected_plant) &
-            (df["mfgcode"] == selected_mfg_code) &
-            (df["product"] == selected_product_name) &
-            (df["dpsptype"] == selected_dpsp_type) &
-            (df["prestype"] == selected_pres_type) &
-            (df["presentation"] == selected_presentation)
-        ]
+        if selected_years:
+            filtered_data = df[
+                (df["years"].isin(selected_years)) &
+                (df["scenario"] == (selected_scenario if selected_scenario else df["scenario"])) &
+                (df["productcode"] == (selected_product if selected_product else df["productcode"])) &
+                (df["plant"] == (selected_plant if selected_plant else df["plant"])) &
+                (df["mfgcode"] == (selected_mfg_code if selected_mfg_code else df["mfgcode"])) &
+                (df["product"] == (selected_product_name if selected_product_name else df["product"])) &
+                (df["dpsptype"] == (selected_dpsp_type if selected_dpsp_type else df["dpsptype"])) &
+                (df["prestype"] == (selected_pres_type if selected_pres_type else df["prestype"])) &
+                (df["presentation"] == (selected_presentation if selected_presentation else df["presentation"]))
+            ]
+        else:
+            filtered_data = pd.DataFrame()  # Empty DataFrame if no years are selected
 
         if not filtered_data.empty:
             st.write("✅ Filtered Data:")
