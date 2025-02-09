@@ -26,7 +26,7 @@ if uploaded_file is not None:
         # Define required columns (normalized)
         required_columns = [
             "years", "scenario", "draft", "demandtype", "productcode", "plant", "mfgcode",
-            "lots", "volumetricgramsmanufactured", "activegrammanufactured", "unitsmanufactured",
+            "lots", "volumetricgramsmanufactured", "activegramsmanufactured", "unitsmanufactured",
             "rawmaterialcost", "siteinventoriableexpenses", "nonsiteinventoriableexpenses",
             "normalscrap", "contractorspend", "cogmjudgement", "carryovercost", "wipcostcogm",
             "cogmcost", "product", "mfgstage", "site", "dpsptype", "prestype", "presentation"
