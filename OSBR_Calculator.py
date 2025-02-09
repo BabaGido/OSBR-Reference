@@ -22,7 +22,7 @@ if uploaded_file is not None:
         # Clean numeric columns
         numeric_columns = [
             "cogmcost", "rawmaterialcost", "lots", "volumetricgramsmanufactured",
-            "activegrammanufactured", "unitsmanufactured", "siteinventoriableexpenses",
+            "activegramsmanufactured", "unitsmanufactured", "siteinventoriableexpenses",
             "nonsiteinventoriableexpenses", "normalscrap", "contractorspend",
             "cogmjudgement", "carryovercost", "wipcostcogm"
         ]
