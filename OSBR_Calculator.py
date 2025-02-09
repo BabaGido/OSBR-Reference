@@ -4,13 +4,13 @@ import pandas as pd
 # Title of the app
 st.title("COGM Calculator")
 
-# Upload Excel file
-uploaded_file = st.file_uploader("Upload your COGM Excel file", type=["xlsx"])
+# Upload CSV file
+uploaded_file = st.file_uploader("Upload your COGM CSV file", type=["csv"])
 
 if uploaded_file is not None:
     try:
-        # Read the Excel file
-        df = pd.read_excel(uploaded_file, engine="openpyxl")
+        # Read the CSV file
+        df = pd.read_csv(uploaded_file)
 
         # Display the uploaded data
         st.write("Uploaded Data Preview:")
@@ -93,4 +93,4 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"An error occurred while processing the file: {e}")
 else:
-    st.info("Please upload an Excel file to get started.")
+    st.info("Please upload a CSV file to get started.")
