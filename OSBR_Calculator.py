@@ -15,18 +15,6 @@ if uploaded_file is not None:
         # Normalize column names: lowercase and remove spaces/special characters
         df.columns = df.columns.str.lower().str.replace(r"[\s_/]", "", regex=True)
 
-        # Convert numeric columns (remove commas and convert to float)
-        numeric_columns = [
-            "cogmcost", "rawmaterialcost", "lots", "volumetricgramsmanufactured",
-            "activegrammanufactured", "unitsmanufactured", "siteinventoriableexpenses",
-            "nonsiteinventoriableexpenses", "normalscrap", "contractorspend",
-            "cogmjudgement", "carryovercost", "wipcostcogm"
-        ]
-        for col in numeric_columns:
-            if col in df.columns:
-                df[col] = df[col].replace({',': ''}, regex=True)  # Remove commas
-                df[col] = pd.to_numeric(df[col], errors="coerce")  # Convert to numeric
-
         # Display the uploaded data
         st.write("Uploaded Data Preview:")
         st.dataframe(df.head())
@@ -52,6 +40,26 @@ if uploaded_file is not None:
         else:
             st.error(f"❌ The following required columns are missing: {', '.join(missing_columns)}")
             st.stop()
+
+        # Clean numeric columns
+        numeric_columns = [
+            "cogmcost", "rawmaterialcost", "lots", "volumetricgramsmanufactured",
+            "activegrammanufactured", "unitsmanufactured", "siteinventoriableexpenses",
+            "nonsiteinventoriableexpenses", "normalscrap", "contractorspend",
+            "cogmjudgement", "carryovercost", "wipcostcogm"
+        ]
+        for col in numeric_columns:
+            if col in df.columns:
+                # Remove commas and other non-numeric characters
+                df[col] = df[col].astype(str).str.replace(r"[^\d.]", "", regex=True)
+                # Convert to numeric, setting errors='coerce' to handle invalid values
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+                # Fill NaN values with 0 (or handle them as needed)
+                df[col] = df[col].fillna(0)
+
+        # Display cleaned data for debugging
+        st.write("Cleaned Data Preview:")
+        st.dataframe(df.head())
 
         # Dropdown for Year Range
         year_list = sorted(df["years"].unique())
