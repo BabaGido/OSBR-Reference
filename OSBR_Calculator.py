@@ -22,7 +22,7 @@ if uploaded_file is not None:
         # Clean numeric columns
         numeric_columns = [
             "cogmcost", "rawmaterialcost", "lots", "volumetricgramsmanufactured",
-            "activegramsmanufactured", "unitsmanufactured", "siteinventoriableexpenses",
+            "activegrammanufactured", "unitsmanufactured", "siteinventoriableexpenses",
             "nonsiteinventoriableexpenses", "normalscrap", "contractorspend",
             "cogmjudgement", "carryovercost", "wipcostcogm"
         ]
@@ -38,7 +38,7 @@ if uploaded_file is not None:
         # Define required columns (normalized)
         required_columns = [
             "years", "scenario", "draft", "demandtype", "productcode", "plant", "mfgcode",
-            "lots", "volumetricgramsmanufactured", "activegramsmanufactured", "unitsmanufactured",
+            "lots", "volumetricgramsmanufactured", "activegrammanufactured", "unitsmanufactured",
             "rawmaterialcost", "siteinventoriableexpenses", "nonsiteinventoriableexpenses",
             "normalscrap", "contractorspend", "cogmjudgement", "carryovercost", "wipcostcogm",
             "cogmcost", "product", "mfgstage", "site", "dpsptype", "prestype", "presentation"
@@ -61,9 +61,16 @@ if uploaded_file is not None:
             default=year_list  # Default to all years
         )
 
-        # Dropdown for Scenario
+        # Scenario Selection (Multi-Select Dropdown with "Select All" option)
         scenario_list = df["scenario"].unique()
-        selected_scenario = st.selectbox("Select Scenario", [""] + list(scenario_list))
+        if st.checkbox("Select All Scenarios"):
+            selected_scenarios = scenario_list
+        else:
+            selected_scenarios = st.multiselect(
+                "Select Scenarios",
+                options=scenario_list,
+                default=scenario_list  # Default to all scenarios
+            )
 
         # Dropdown for Product Code
         product_list = df["productcode"].unique()
@@ -97,7 +104,7 @@ if uploaded_file is not None:
         if selected_years:
             filtered_data = df[
                 (df["years"].isin(selected_years)) &
-                (df["scenario"] == (selected_scenario if selected_scenario else df["scenario"])) &
+                (df["scenario"].isin(selected_scenarios)) &
                 (df["productcode"] == (selected_product if selected_product else df["productcode"])) &
                 (df["plant"] == (selected_plant if selected_plant else df["plant"])) &
                 (df["mfgcode"] == (selected_mfg_code if selected_mfg_code else df["mfgcode"])) &
