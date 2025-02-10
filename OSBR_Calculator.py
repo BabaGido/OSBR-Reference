@@ -53,102 +53,107 @@ if uploaded_file is not None:
             st.error(f"❌ The following required columns are missing: {', '.join(missing_columns)}")
             st.stop()
 
-        # Year Selection (Multi-Select Dropdown)
-        year_list = sorted(df["years"].unique())
-        selected_years = st.multiselect(
-            "Select Years",
-            options=year_list,
-            default=year_list  # Default to all years
-        )
-
-        # Scenario Selection (Multi-Select Dropdown with "Select All" option)
-        scenario_list = df["scenario"].unique()
-        if st.checkbox("Select All Scenarios"):
-            selected_scenarios = scenario_list
-        else:
-            selected_scenarios = st.multiselect(
-                "Select Scenarios",
-                options=scenario_list,
-                default=scenario_list  # Default to all scenarios
-            )
-
-        # Dropdown for Product Code
-        product_list = df["productcode"].unique()
-        selected_product = st.selectbox("Select Product Code", [""] + list(product_list))
-
-        # Dropdown for Plant
-        plant_list = df["plant"].unique()
-        selected_plant = st.selectbox("Select Plant", [""] + list(plant_list))
-
-        # Dropdown for Mfg Code
-        mfg_code_list = df["mfgcode"].unique()
-        selected_mfg_code = st.selectbox("Select Mfg Code", [""] + list(mfg_code_list))
-
-        # Dropdown for Product
+        # Dropdown for Product Name
         product_name_list = df["product"].unique()
-        selected_product_name = st.selectbox("Select Product", [""] + list(product_name_list))
+        selected_product_name = st.selectbox("Select Product", product_name_list)
 
-        # Dropdown for DP/SP Type
-        dpsp_type_list = df["dpsptype"].unique()
-        selected_dpsp_type = st.selectbox("Select DP/SP Type", [""] + list(dpsp_type_list))
+        # Auto-populate filters based on selected product
+        if selected_product_name:
+            product_data = df[df["product"] == selected_product_name]
 
-        # Dropdown for Pres Type
-        pres_type_list = df["prestype"].unique()
-        selected_pres_type = st.selectbox("Select Pres Type", [""] + list(pres_type_list))
+            # Year Selection (Dropdown for one year at a time)
+            year_list = sorted(product_data["years"].unique())
+            selected_year = st.selectbox("Select Year", year_list)
 
-        # Dropdown for Presentation
-        presentation_list = df["presentation"].unique()
-        selected_presentation = st.selectbox("Select Presentation", [""] + list(presentation_list))
+            # Scenario Selection (Multi-Select Dropdown with "Select All" option)
+            scenario_list = product_data["scenario"].unique()
+            if st.checkbox("Select All Scenarios"):
+                selected_scenarios = scenario_list
+            else:
+                selected_scenarios = st.multiselect(
+                    "Select Scenarios",
+                    options=scenario_list,
+                    default=scenario_list  # Default to all scenarios
+                )
 
-        # Filter data based on selections
-        if selected_years:
-            filtered_data = df[
-                (df["years"].isin(selected_years)) &
-                (df["scenario"].isin(selected_scenarios)) &
-                (df["productcode"] == (selected_product if selected_product else df["productcode"])) &
-                (df["plant"] == (selected_plant if selected_plant else df["plant"])) &
-                (df["mfgcode"] == (selected_mfg_code if selected_mfg_code else df["mfgcode"])) &
-                (df["product"] == (selected_product_name if selected_product_name else df["product"])) &
-                (df["dpsptype"] == (selected_dpsp_type if selected_dpsp_type else df["dpsptype"])) &
-                (df["prestype"] == (selected_pres_type if selected_pres_type else df["prestype"])) &
-                (df["presentation"] == (selected_presentation if selected_presentation else df["presentation"]))
+            # Plant Selection (Include all sites)
+            plant_list = product_data["plant"].unique()
+            selected_plants = plant_list  # Include all plants by default
+
+            # Mfg Code Selection
+            mfg_code_list = product_data["mfgcode"].unique()
+            selected_mfg_codes = mfg_code_list  # Include all Mfg Codes by default
+
+            # DP/SP Type Selection
+            dpsp_type_list = product_data["dpsptype"].unique()
+            selected_dpsp_types = dpsp_type_list  # Include all DP/SP Types by default
+
+            # Pres Type Selection
+            pres_type_list = product_data["prestype"].unique()
+            selected_pres_types = pres_type_list  # Include all Pres Types by default
+
+            # Presentation Selection
+            presentation_list = product_data["presentation"].unique()
+            selected_presentations = presentation_list  # Include all Presentations by default
+
+            # Filter data based on selections
+            filtered_data = product_data[
+                (product_data["years"] == selected_year) &
+                (product_data["scenario"].isin(selected_scenarios)) &
+                (product_data["plant"].isin(selected_plants)) &
+                (product_data["mfgcode"].isin(selected_mfg_codes)) &
+                (product_data["dpsptype"].isin(selected_dpsp_types)) &
+                (product_data["prestype"].isin(selected_pres_types)) &
+                (product_data["presentation"].isin(selected_presentations))
             ]
+
+            if not filtered_data.empty:
+                st.write("✅ Filtered Data:")
+                st.dataframe(filtered_data)
+
+                # Calculation Selector
+                calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot", "Cost per Sold Unit"]
+                selected_calculation = st.selectbox("Select Calculation", calculation_options)
+
+                if selected_calculation == "Average COGM Cost/Lot":
+                    # Perform Average COGM Cost/Lot calculation
+                    average_cogm_cost = filtered_data["cogmcost"].mean() / 1_000_000  # Convert to $M
+                    total_lots = filtered_data["lots"].sum()
+                    average_cogm_cost_per_lot = (average_cogm_cost / total_lots) if total_lots != 0 else 0
+
+                    # Display results
+                    st.write("### Calculation Results")
+                    st.write(f"**Average COGM Cost for Selected Product ({selected_product_name}):** ${average_cogm_cost:,.2f}M")
+                    st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
+                    st.write(f"**Average COGM Cost/Lot for Selected Product ({selected_product_name}):** ${average_cogm_cost_per_lot:,.2f}M")
+
+                elif selected_calculation == "Average RM Cost/Lot":
+                    # Perform Average RM Cost/Lot calculation
+                    average_rm_cost = filtered_data["rawmaterialcost"].mean() / 1_000_000  # Convert to $M
+                    total_lots = filtered_data["lots"].sum()
+                    average_rm_cost_per_lot = (average_rm_cost / total_lots) if total_lots != 0 else 0
+
+                    # Display results
+                    st.write("### Calculation Results")
+                    st.write(f"**Average Raw Material Cost for Selected Product ({selected_product_name}):** ${average_rm_cost:,.2f}M")
+                    st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
+                    st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.2f}M")
+
+                elif selected_calculation == "Cost per Sold Unit":
+                    # Perform Cost per Sold Unit calculation
+                    total_cogm = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
+                    total_lots = filtered_data["lots"].sum()
+                    cost_per_sold_unit = (total_cogm / total_lots) if total_lots != 0 else 0
+
+                    # Display results
+                    st.write("### Calculation Results")
+                    st.write(f"**Total COGM for Selected Product ({selected_product_name}) in {selected_year}:** ${total_cogm:,.2f}M")
+                    st.write(f"**Total Lots for Selected Product ({selected_product_name}) in {selected_year}:** {total_lots:,}")
+                    st.write(f"**Cost per Sold Unit for Selected Product ({selected_product_name}) in {selected_year}:** ${cost_per_sold_unit:,.2f}M")
+            else:
+                st.warning("❌ No data found for the selected filters.")
         else:
-            filtered_data = pd.DataFrame()  # Empty DataFrame if no years are selected
-
-        if not filtered_data.empty:
-            st.write("✅ Filtered Data:")
-            st.dataframe(filtered_data)
-
-            # Calculation Selector
-            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot"]
-            selected_calculation = st.selectbox("Select Calculation", calculation_options)
-
-            if selected_calculation == "Average COGM Cost/Lot":
-                # Perform Average COGM Cost/Lot calculation
-                average_cogm_cost = filtered_data["cogmcost"].mean() / 1_000_000  # Convert to $M
-                total_lots = filtered_data["lots"].sum()
-                average_cogm_cost_per_lot = (average_cogm_cost / total_lots) if total_lots != 0 else 0
-
-                # Display results
-                st.write("### Calculation Results")
-                st.write(f"**Average COGM Cost for Selected Product ({selected_product_name}):** ${average_cogm_cost:,.2f}M")
-                st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
-                st.write(f"**Average COGM Cost/Lot for Selected Product ({selected_product_name}):** ${average_cogm_cost_per_lot:,.2f}M")
-
-            elif selected_calculation == "Average RM Cost/Lot":
-                # Perform Average RM Cost/Lot calculation
-                average_rm_cost = filtered_data["rawmaterialcost"].mean() / 1_000_000  # Convert to $M
-                total_lots = filtered_data["lots"].sum()
-                average_rm_cost_per_lot = (average_rm_cost / total_lots) if total_lots != 0 else 0
-
-                # Display results
-                st.write("### Calculation Results")
-                st.write(f"**Average Raw Material Cost for Selected Product ({selected_product_name}):** ${average_rm_cost:,.2f}M")
-                st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
-                st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.2f}M")
-        else:
-            st.warning("❌ No data found for the selected filters.")
+            st.warning("❌ Please select a product.")
     except Exception as e:
         st.error(f"❌ An error occurred while processing the file: {e}")
 else:
