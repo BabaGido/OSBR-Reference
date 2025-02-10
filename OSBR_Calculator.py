@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Title of the app
-st.title("COGM Calculator")
+st.title("OSBR Calculator")
 
 # Upload CSV file
 uploaded_file = st.file_uploader("Upload your COGM CSV file", type=["csv"])
