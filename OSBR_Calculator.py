@@ -19,7 +19,6 @@ st.sidebar.write("""
 
 #### **Finished Drug Product (FDP) Plants**
 - **Location**: AML, ABR, AOH
-- **Products**: Kyprolis (Final Pack), Darzalex (Final Pack)
 - **Description**: FDP plants manage the final packaging and distribution of finished drug products.
 """)
 
