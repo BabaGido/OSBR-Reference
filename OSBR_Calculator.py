@@ -4,6 +4,25 @@ import pandas as pd
 # Title of the app
 st.title("COGM Calculator")
 
+# Informational Guide
+st.sidebar.title("Plant Site Information")
+st.sidebar.write("""
+### Categories of Products and Plant Sites
+
+#### **Drug Substance (DS) Plants**
+- **Location**: AML6, AML7, ARI30, ARI5, ASM1, ASM2, ANC1, ANC2, ATO23, ATO 07
+- **Description**: DS plants are responsible for the production of active pharmaceutical ingredients (APIs).
+
+#### **Drug Product (DP) Plants**
+- **Location**: ATO20, AWM, ADL, AML14
+- **Description**: DP plants handle the formulation and packaging of drug products.
+
+#### **Finished Drug Product (FDP) Plants**
+- **Location**: AML, ABR, AOH
+- **Products**: Kyprolis (Final Pack), Darzalex (Final Pack)
+- **Description**: FDP plants manage the final packaging and distribution of finished drug products.
+""")
+
 # Upload CSV file
 uploaded_file = st.file_uploader("Upload your COGM CSV file", type=["csv"])
 
