@@ -168,16 +168,31 @@ if uploaded_file is not None:
                 st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.3f}M")
                 
             elif selected_calculation == "DP/FDP: Cost per Unit":
-                # Perform DP/FDP: Cost per Unit calculation
-                total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
-                total_units = filtered_data["unitsmanufactured"].sum()
-                cost_per_unit = (total_cogm_cost / total_units) if total_units != 0 else 0
-
-                # Display results
-                st.write("### Calculation Results")
-                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.3f}M")
-                st.write(f"**Total Manufactured Units for Selected Product ({selected_product_name}):** {total_units:,}")
-                st.write(f"**Cost per Unit for Selected Product ({selected_product_name}):** ${cost_per_unit:,.3f}")
+            # Perform DP/FDP: Cost per Unit calculation
+            total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
+        
+            # Clean and sum the unitsmanufactured column
+            filtered_data["unitsmanufactured"] = (
+                filtered_data["unitsmanufactured"]
+                .astype(str)  # Ensure it's treated as a string
+                .str.replace(r"[^\d.]", "", regex=True)  # Remove non-numeric characters
+                .replace("", "0")  # Replace empty strings with "0"
+            )
+            filtered_data["unitsmanufactured"] = pd.to_numeric(filtered_data["unitsmanufactured"], errors="coerce")
+            total_units = filtered_data["unitsmanufactured"].sum()
+        
+            # Calculate cost per unit
+            if total_units > 0:
+                cost_per_unit = total_cogm_cost / total_units
+            else:
+                cost_per_unit = 0
+                st.warning("⚠️ Total Manufactured Units is 0. Cannot calculate Cost per Unit.")
+        
+            # Display results
+            st.write("### Calculation Results")
+            st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.3f}M")
+            st.write(f"**Total Manufactured Units for Selected Product ({selected_product_name}):** {total_units:,}")
+            st.write(f"**Cost per Unit for Selected Product ({selected_product_name}):** ${cost_per_unit:,.3f}")
 
             elif selected_calculation == "DS: Cost per Gram":
                 # Perform DS: Cost per Gram calculation
