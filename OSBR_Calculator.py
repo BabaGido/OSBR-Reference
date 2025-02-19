@@ -140,7 +140,7 @@ if uploaded_file is not None:
             st.dataframe(filtered_data)
 
             # Calculation Selector
-            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot"]
+            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot","DP/FDP: Cost per Unit","DS: Cost per Gram"]
             selected_calculation = st.selectbox("Select Calculation", calculation_options)
 
             if selected_calculation == "Average COGM Cost/Lot":
