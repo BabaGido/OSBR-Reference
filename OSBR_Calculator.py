@@ -14,11 +14,12 @@ st.sidebar.write("""
 - **Description**: DS plants are responsible for the production of active pharmaceutical ingredients (APIs).
 
 #### **Drug Product (DP) Plants**
-- **Location**: ATO20, ADL, AML14
+- **Location**: ATO20, AWM, ADL, AML14
 - **Description**: DP plants handle the formulation and packaging of drug products.
 
 #### **Finished Drug Product (FDP) Plants**
 - **Location**: AML, ABR, AOH
+-
 - **Description**: FDP plants manage the final packaging and distribution of finished drug products.
 """)
 
@@ -165,6 +166,30 @@ if uploaded_file is not None:
                 st.write(f"**Average Raw Material Cost for Selected Product ({selected_product_name}):** ${average_rm_cost:,.2f}M")
                 st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
                 st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.2f}M")
+                
+            elif selected_calculation == "DP/FDP: Cost per Unit":
+                # Perform DP/FDP: Cost per Unit calculation
+                total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
+                total_units = filtered_data["unitsmanufactured"].sum()
+                cost_per_unit = (total_cogm_cost / total_units) if total_units != 0 else 0
+
+                # Display results
+                st.write("### Calculation Results")
+                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.2f}M")
+                st.write(f"**Total Manufactured Units for Selected Product ({selected_product_name}):** {total_units:,}")
+                st.write(f"**Cost per Unit for Selected Product ({selected_product_name}):** ${cost_per_unit:,.2f}")
+
+            elif selected_calculation == "DS: Cost per Gram":
+                # Perform DS: Cost per Gram calculation
+                total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
+                total_active_grams = filtered_data["activegrammanufactured"].sum()
+                cost_per_gram = (total_cogm_cost / total_active_grams) if total_active_grams != 0 else 0
+
+                # Display results
+                st.write("### Calculation Results")
+                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.2f}M")
+                st.write(f"**Total Active Grams for Selected Product ({selected_product_name}):** {total_active_grams:,}")
+                st.write(f"**Cost per Gram for Selected Product ({selected_product_name}):** ${cost_per_gram:,.2f}")
         else:
             st.warning("❌ No data found for the selected filters.")
     except Exception as e:
