@@ -167,11 +167,14 @@ if uploaded_file is not None:
                 st.write(f"**Average Raw Material Cost for Selected Product ({selected_product_name}):** ${average_rm_cost:,.3f}M")
                 st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
                 st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.3f}M")
-
+                
             elif selected_calculation == "DP/FDP: Cost per Unit":
                 # Perform DP/FDP: Cost per Unit calculation
                 total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
-
+            
+                # Debugging: Display total COGM cost
+                st.write(f"**Debug: Total COGM Cost (in $M):** ${total_cogm_cost:,.3f}")
+            
                 # Clean and sum the unitsmanufactured column
                 filtered_data["unitsmanufactured"] = (
                     filtered_data["unitsmanufactured"]
@@ -181,7 +184,10 @@ if uploaded_file is not None:
                 )
                 filtered_data["unitsmanufactured"] = pd.to_numeric(filtered_data["unitsmanufactured"], errors="coerce")
                 total_units = filtered_data["unitsmanufactured"].sum()
-
+            
+                # Debugging: Display total units manufactured
+                st.write(f"**Debug: Total Units Manufactured:** {total_units:,}")
+            
                 # Calculate cost per unit
                 if total_units > 0:
                     cost_per_unit = total_cogm_cost / total_units
