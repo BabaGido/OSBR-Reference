@@ -14,7 +14,7 @@ st.sidebar.write("""
 - **Description**: DS plants are responsible for the production of active pharmaceutical ingredients (APIs).
 
 #### **Drug Product (DP) Plants**
-- **Location**: ATO20, AWM, ADL, AML14
+- **Location**: ATO20, ADL, AML14
 - **Description**: DP plants handle the formulation and packaging of drug products.
 
 #### **Finished Drug Product (FDP) Plants**
