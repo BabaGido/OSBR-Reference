@@ -19,6 +19,7 @@ st.sidebar.write("""
 
 #### **Finished Drug Product (FDP) Plants**
 - **Location**: AML, ABR, AOH
+-
 - **Description**: FDP plants manage the final packaging and distribution of finished drug products.
 """)
 
@@ -48,8 +49,6 @@ if uploaded_file is not None:
             if col in df.columns:
                 # Remove commas and other non-numeric characters
                 df[col] = df[col].astype(str).str.replace(r"[^\d.]", "", regex=True)
-                # Replace empty strings with "0"
-                df[col] = df[col].replace("", "0")
                 # Convert to numeric, setting errors='coerce' to handle invalid values
                 df[col] = pd.to_numeric(df[col], errors="coerce")
                 # Fill NaN values with 0 (or handle them as needed)
@@ -141,7 +140,7 @@ if uploaded_file is not None:
             st.dataframe(filtered_data)
 
             # Calculation Selector
-            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot", "DP/FDP: Cost per Unit", "DS: Cost per Gram"]
+            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot","DP/FDP: Cost per Unit","DS: Cost per Gram"]
             selected_calculation = st.selectbox("Select Calculation", calculation_options)
 
             if selected_calculation == "Average COGM Cost/Lot":
@@ -171,29 +170,8 @@ if uploaded_file is not None:
             elif selected_calculation == "DP/FDP: Cost per Unit":
                 # Perform DP/FDP: Cost per Unit calculation
                 total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
-            
-                # Debugging: Display total COGM cost
-                st.write(f"**Debug: Total COGM Cost (in $M):** ${total_cogm_cost:,.3f}")
-            
-                # Clean and sum the unitsmanufactured column
-                filtered_data["unitsmanufactured"] = (
-                    filtered_data["unitsmanufactured"]
-                    .astype(str)  # Ensure it's treated as a string
-                    .str.replace(r"[^\d.]", "", regex=True)  # Remove non-numeric characters
-                    .replace("", "0")  # Replace empty strings with "0"
-                )
-                filtered_data["unitsmanufactured"] = pd.to_numeric(filtered_data["unitsmanufactured"], errors="coerce")
                 total_units = filtered_data["unitsmanufactured"].sum()
-            
-                # Debugging: Display total units manufactured
-                st.write(f"**Debug: Total Units Manufactured:** {total_units:,}")
-            
-                # Calculate cost per unit
-                if total_units > 0:
-                    cost_per_unit = total_cogm_cost / total_units
-                else:
-                    cost_per_unit = 0
-                    st.warning("⚠️ Total Manufactured Units is 0. Cannot calculate Cost per Unit.")
+                cost_per_unit = (total_cogm_cost / total_units) if total_units != 0 else 0
 
                 # Display results
                 st.write("### Calculation Results")
