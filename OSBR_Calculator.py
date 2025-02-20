@@ -19,7 +19,6 @@ st.sidebar.write("""
 
 #### **Finished Drug Product (FDP) Plants**
 - **Location**: AML, ABR, AOH
--
 - **Description**: FDP plants manage the final packaging and distribution of finished drug products.
 """)
 
@@ -140,7 +139,7 @@ if uploaded_file is not None:
             st.dataframe(filtered_data)
 
             # Calculation Selector
-            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot","DP/FDP: Cost per Unit","DS: Cost per Gram"]
+            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot"]
             selected_calculation = st.selectbox("Select Calculation", calculation_options)
 
             if selected_calculation == "Average COGM Cost/Lot":
@@ -151,9 +150,9 @@ if uploaded_file is not None:
 
                 # Display results
                 st.write("### Calculation Results")
-                st.write(f"**Average COGM Cost for Selected Product ({selected_product_name}):** ${average_cogm_cost:,.3f}M")
+                st.write(f"**Average COGM Cost for Selected Product ({selected_product_name}):** ${average_cogm_cost:,.2f}M")
                 st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
-                st.write(f"**Average COGM Cost/Lot for Selected Product ({selected_product_name}):** ${average_cogm_cost_per_lot:,.3f}M")
+                st.write(f"**Average COGM Cost/Lot for Selected Product ({selected_product_name}):** ${average_cogm_cost_per_lot:,.2f}M")
 
             elif selected_calculation == "Average RM Cost/Lot":
                 # Perform Average RM Cost/Lot calculation
@@ -163,33 +162,9 @@ if uploaded_file is not None:
 
                 # Display results
                 st.write("### Calculation Results")
-                st.write(f"**Average Raw Material Cost for Selected Product ({selected_product_name}):** ${average_rm_cost:,.3f}M")
+                st.write(f"**Average Raw Material Cost for Selected Product ({selected_product_name}):** ${average_rm_cost:,.2f}M")
                 st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
-                st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.3f}M")
-                
-            elif selected_calculation == "DP/FDP: Cost per Unit":
-                # Perform DP/FDP: Cost per Unit calculation
-                total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
-                total_units = filtered_data["unitsmanufactured"].sum()
-                cost_per_unit = (total_cogm_cost / total_units) if total_units != 0 else 0
-
-                # Display results
-                st.write("### Calculation Results")
-                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.3f}M")
-                st.write(f"**Total Manufactured Units for Selected Product ({selected_product_name}):** {total_units:,}")
-                st.write(f"**Cost per Unit for Selected Product ({selected_product_name}):** ${cost_per_unit:,.3f}")
-
-            elif selected_calculation == "DS: Cost per Gram":
-                # Perform DS: Cost per Gram calculation
-                total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000  # Convert to $M
-                total_active_grams = filtered_data["activegramsmanufactured"].sum()
-                cost_per_gram = (total_cogm_cost / total_active_grams) if total_active_grams != 0 else 0
-
-                # Display results
-                st.write("### Calculation Results")
-                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.3f}M")
-                st.write(f"**Total Active Grams for Selected Product ({selected_product_name}):** {total_active_grams:,}")
-                st.write(f"**Cost per Gram for Selected Product ({selected_product_name}):** ${cost_per_gram:,.3f}")
+                st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.2f}M")
         else:
             st.warning("❌ No data found for the selected filters.")
     except Exception as e:
