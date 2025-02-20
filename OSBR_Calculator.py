@@ -188,7 +188,7 @@ if uploaded_file is not None:
                 st.write("### Calculation Results")
                 st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.2f}")
                 st.write(f"**Total Manufactured Units for Selected Product ({selected_product_name}):** {total_units:,}")
-                st.write(f"** Cost per Unit for Selected Product ({selected_product_name}):** ${cost_per_unit:,.2f}")
+                st.write(f"**Cost per Unit for Selected Product ({selected_product_name}):** ${cost_per_unit:,.2f}")
 
         else:
             st.warning("❌ No data found for the selected filters.")
