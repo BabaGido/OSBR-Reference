@@ -165,6 +165,19 @@ if uploaded_file is not None:
                 st.write(f"**Average Raw Material Cost for Selected Product ({selected_product_name}):** ${average_rm_cost:,.2f}M")
                 st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
                 st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.2f}M")
+                
+            elif selected_calculation == "DS: Cost per Gram":
+                #Perform DS: Cost per Gram Calculation
+                total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000 #convert to $M
+                total_active_grams = filtered_data["activegramsmanufacutred"].sum()
+                cost_per_gram = (total_cogm_cost / total_active_grams) if total_active_grams != 0 else 0
+
+                #Display results
+                st.write("### Calculation Results")
+                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):**${total_cogm_cost:,.2f}M")
+                st.write(f"**Total Active Grams for Selected Product ({selected_product_name}):**{total_active_grams:,}")
+                st.write(f"**Cost per Gram for Selected Product ({selected_product_name}):**${cost_per_gram:,.2f}")
+
         else:
             st.warning("❌ No data found for the selected filters.")
     except Exception as e:
