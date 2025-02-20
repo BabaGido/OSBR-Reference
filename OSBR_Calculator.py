@@ -139,7 +139,7 @@ if uploaded_file is not None:
             st.dataframe(filtered_data)
 
             # Calculation Selector
-            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot"]
+            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot", "DS Cost per Gram"]
             selected_calculation = st.selectbox("Select Calculation", calculation_options)
 
             if selected_calculation == "Average COGM Cost/Lot":
@@ -166,7 +166,7 @@ if uploaded_file is not None:
                 st.write(f"**Total Lots for Selected Product ({selected_product_name}):** {total_lots:,}")
                 st.write(f"**Average RM Cost/Lot for Selected Product ({selected_product_name}):** ${average_rm_cost_per_lot:,.2f}M")
                 
-            elif selected_calculation == "DS: Cost per Gram":
+            elif selected_calculation == "DS Cost per Gram":
                 #Perform DS: Cost per Gram Calculation
                 total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000 #convert to $M
                 total_active_grams = filtered_data["activegramsmanufacutred"].sum()
