@@ -169,7 +169,7 @@ if uploaded_file is not None:
             elif selected_calculation == "DS Cost per Gram":
                 #Perform DS: Cost per Gram Calculation
                 total_cogm_cost = filtered_data["cogmcost"].sum() / 1_000_000 #convert to $M
-                total_active_grams = filtered_data["activegramsmanufactured"].sum()
+                total_active_grams = filtered_data["activegramsmanufactured"].sum() / 1_000_000 #convert to M
                 cost_per_gram = (total_cogm_cost / total_active_grams) if total_active_grams != 0 else 0
 
                 #Display results
