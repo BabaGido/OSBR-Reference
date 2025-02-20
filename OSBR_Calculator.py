@@ -174,9 +174,9 @@ if uploaded_file is not None:
 
                 #Display results
                 st.write("### Calculation Results")
-                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.2f}M")
+                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.2f}")
                 st.write(f"**Total Active Grams for Selected Product ({selected_product_name}):** {total_active_grams:,}")
-                st.write(f"**Cost per Gram for Selected Product ({selected_product_name}):** ${cost_per_gram:,.2f}M")
+                st.write(f"**Cost per Gram for Selected Product ({selected_product_name}):** ${cost_per_gram:,.2f}")
 
         else:
             st.warning("❌ No data found for the selected filters.")
