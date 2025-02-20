@@ -139,7 +139,7 @@ if uploaded_file is not None:
             st.dataframe(filtered_data)
 
             # Calculation Selector
-            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot", "DS Cost per Gram"]
+            calculation_options = ["Average COGM Cost/Lot", "Average RM Cost/Lot", "DS Cost per Gram", "DP/FDP: Cost per Unit"]
             selected_calculation = st.selectbox("Select Calculation", calculation_options)
 
             if selected_calculation == "Average COGM Cost/Lot":
@@ -177,6 +177,18 @@ if uploaded_file is not None:
                 st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.2f}")
                 st.write(f"**Total Active Grams for Selected Product ({selected_product_name}):** {total_active_grams:,}")
                 st.write(f"**Cost per Gram for Selected Product ({selected_product_name}):** ${cost_per_gram:,.2f}")
+
+            elif selected_calculation == "DP/FDP: Cost per Unit":
+                #Perfrom DP/FDP: Cost per Unit Calculation
+                total_cogm_cost = filtered_data["cogmcost"].sum()
+                total_units = filtered_data["unitsmanufactured"].sum()
+                cost_per_unit = (total_cogm_cost / total_units) if total_units != 0 else 0
+
+                #Display results
+                st.write("### Calculation Results")
+                st.write(f"**Total COGM Cost for Selected Product ({selected_product_name}):** ${total_cogm_cost:,.2f}")
+                st.write(f"**Total Manufactured Units for Selected Product ({selected_product_name}):** {total_units:,}")
+                st.write(f"** Cost per Unit for Selected Product ({selected_product_name}):** ${cost_per_unit:,.2f}")
 
         else:
             st.warning("❌ No data found for the selected filters.")
