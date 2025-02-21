@@ -95,6 +95,7 @@ if uploaded_file is not None:
         selected_product = st.selectbox("Select Product Code", [""] + list(product_list))
 
         # Dropdown for Plant
+        st.markdown("**Plant**(Required)")
         plant_list = df["plant"].unique()
         selected_plant = st.selectbox("Select Plant", [""] + list(plant_list))
 
@@ -103,6 +104,7 @@ if uploaded_file is not None:
         selected_mfg_code = st.selectbox("Select Mfg Code", [""] + list(mfg_code_list))
 
         # Dropdown for Product
+        st.markdown("**product**(Required)")
         product_name_list = df["product"].unique()
         selected_product_name = st.selectbox("Select Product", [""] + list(product_name_list))
 
