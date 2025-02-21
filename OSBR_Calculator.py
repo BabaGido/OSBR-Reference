@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Title of the app
-st.title("COGM Calculator")
+st.title("OSBR Reference Guide Calculator")
 
 # Informational Guide
 st.sidebar.title("Plant Site Information")
